@@ -53,9 +53,9 @@ function inc(importance) {
         .pipe(gulp.dest('./'));
 }
 
-gulp.task('publish', function (done) {
-  spawn('npm', ['publish'], { stdio: 'inherit' }).on('close', done);
-});
+// gulp.task('publish', function (done) {
+//   spawn('npm', ['publish'], { stdio: 'inherit' }).on('close', done);
+// });
 
 gulp.task('push', function (done) {
   git.push('origin', 'master', {args: '--tags'}, function (err) {
@@ -78,13 +78,13 @@ gulp.task('bumpMinor', function() { return inc('minor'); })
 gulp.task('bumpMajor', function() { return inc('major'); })
 
 gulp.task('patch', function() {
-    runSequence('bumpPatch', 'default', 'tag', 'publish', 'push');
+    runSequence('bumpPatch', 'default', 'tag', 'push');
 });
 gulp.task('minor', function() {
-    runSequence('bumpMinor', 'default', 'tag', 'publish', 'push');
+    runSequence('bumpMinor', 'default', 'tag', 'push');
 });
 gulp.task('major', function() {
-    runSequence('bumpMajor', 'default', 'tag', 'publish', 'push');
+    runSequence('bumpMajor', 'default', 'tag', 'push');
 });
 
 gulp.task('serve', serve('.'));

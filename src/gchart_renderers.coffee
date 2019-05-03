@@ -26,7 +26,8 @@ callWithJQuery ($) ->
         colKeys.push [] if colKeys.length == 0
         fullAggName = pivotData.aggregatorName
         if pivotData.valAttrs.length
-            fullAggName += "(#{pivotData.valAttrs.join(", ")})"
+            valAttrs = pivotData.valAttrs.map (item) -> opts.labels[item] ? item
+            fullAggName += "(#{valAttrs.join(", ")})"
         headers = (h.join("-") for h in rowKeys)
         headers.unshift ""
 
@@ -70,9 +71,11 @@ callWithJQuery ($) ->
             dataTable = google.visualization.arrayToDataTable(dataArray)
 
             title = vAxisTitle = fullAggName
-            hAxisTitle = pivotData.colAttrs.join("-")
+            hAxisTitle = pivotData.colAttrs.map (item) -> opts.labels[item] ? item
+            .join("-")
             title += " #{opts.localeStrings.vs} #{hAxisTitle}" if hAxisTitle != ""
-            groupByTitle = pivotData.rowAttrs.join("-")
+            groupByTitle = pivotData.rowAttrs.map (item) -> opts.labels[item] ? item
+            .join("-")
             title += " #{opts.localeStrings.by} #{groupByTitle}" if groupByTitle != ""
 
         options =
@@ -91,7 +94,7 @@ callWithJQuery ($) ->
         else if dataArray[0].length == 2 and dataArray[0][1] ==  ""
             options.legend = position: "none"
 
-        options = $.extend(true, {}, options, opts.gchart, extraOptions)
+        options = $.extend(true, {}, options, opts.gchart, extraOptions, opts)
 
         result = $("<div>").css(width: "100%", height: "100%")
         wrapper = new google.visualization.ChartWrapper {dataTable, chartType, options}
@@ -109,3 +112,4 @@ callWithJQuery ($) ->
         "Stacked Bar Chart": makeGoogleChart("ColumnChart", isStacked: true)
         "Area Chart": makeGoogleChart("AreaChart", isStacked: true)
         "Scatter Chart": makeGoogleChart("ScatterChart")
+        "Pie Chart": makeGoogleChart("PieChart")

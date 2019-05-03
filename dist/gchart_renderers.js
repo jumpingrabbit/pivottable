@@ -15,7 +15,7 @@
     var makeGoogleChart;
     makeGoogleChart = function(chartType, extraOptions) {
       return function(pivotData, opts) {
-        var agg, base, base1, colKey, colKeys, dataArray, dataTable, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, len, len1, numCharsInHAxis, options, ref, result, row, rowKey, rowKeys, title, tree2, vAxisTitle, val, wrapper, x, y;
+        var agg, base, base1, colKey, colKeys, dataArray, dataTable, defaults, fullAggName, groupByTitle, h, hAxisTitle, headers, i, j, len, len1, numCharsInHAxis, options, ref, result, row, rowKey, rowKeys, title, tree2, vAxisTitle, val, valAttrs, wrapper, x, y;
         defaults = {
           localeStrings: {
             vs: "vs",
@@ -40,7 +40,11 @@
         }
         fullAggName = pivotData.aggregatorName;
         if (pivotData.valAttrs.length) {
-          fullAggName += "(" + (pivotData.valAttrs.join(", ")) + ")";
+          valAttrs = pivotData.valAttrs.map(function(item) {
+            var ref;
+            return (ref = opts.labels[item]) != null ? ref : item;
+          });
+          fullAggName += "(" + (valAttrs.join(", ")) + ")";
         }
         headers = (function() {
           var i, len, results;
@@ -102,11 +106,17 @@
           }
           dataTable = google.visualization.arrayToDataTable(dataArray);
           title = vAxisTitle = fullAggName;
-          hAxisTitle = pivotData.colAttrs.join("-");
+          hAxisTitle = pivotData.colAttrs.map(function(item) {
+            var ref1;
+            return (ref1 = opts.labels[item]) != null ? ref1 : item;
+          }).join("-");
           if (hAxisTitle !== "") {
             title += " " + opts.localeStrings.vs + " " + hAxisTitle;
           }
-          groupByTitle = pivotData.rowAttrs.join("-");
+          groupByTitle = pivotData.rowAttrs.map(function(item) {
+            var ref1;
+            return (ref1 = opts.labels[item]) != null ? ref1 : item;
+          }).join("-");
           if (groupByTitle !== "") {
             title += " " + opts.localeStrings.by + " " + groupByTitle;
           }
@@ -143,7 +153,7 @@
             position: "none"
           };
         }
-        options = $.extend(true, {}, options, opts.gchart, extraOptions);
+        options = $.extend(true, {}, options, opts.gchart, extraOptions, opts);
         result = $("<div>").css({
           width: "100%",
           height: "100%"
@@ -174,7 +184,8 @@
       "Area Chart": makeGoogleChart("AreaChart", {
         isStacked: true
       }),
-      "Scatter Chart": makeGoogleChart("ScatterChart")
+      "Scatter Chart": makeGoogleChart("ScatterChart"),
+      "Pie Chart": makeGoogleChart("PieChart")
     };
   });
 
