@@ -910,7 +910,7 @@
     Default Renderer for hierarchical table layout
      */
     pivotTableRenderer = function(pivotData, opts) {
-      var aggregator, c, colAttrs, colKey, colKeys, defaults, getClickHandler, i, j, r, result, rowAttrs, rowKey, rowKeys, spanSize, tbody, td, th, thead, totalAggregator, tr, txt, val, x;
+      var aggregator, c, colAttrs, colKey, colKeys, defaults, getClickHandler, i, j, r, ref, ref1, result, rowAttrs, rowKey, rowKeys, spanSize, tbody, td, th, thead, totalAggregator, tr, txt, val, x;
       defaults = {
         table: {
           clickCallback: null,
@@ -992,7 +992,7 @@
         }
         th = document.createElement("th");
         th.className = "pvtAxisLabel";
-        th.textContent = c;
+        th.textContent = (ref = opts.labels[c]) != null ? ref : c;
         tr.appendChild(th);
         for (i in colKeys) {
           if (!hasProp.call(colKeys, i)) continue;
@@ -1025,7 +1025,7 @@
           r = rowAttrs[i];
           th = document.createElement("th");
           th.className = "pvtAxisLabel";
-          th.textContent = r;
+          th.textContent = (ref1 = opts.labels[r]) != null ? ref1 : r;
           tr.appendChild(th);
         }
         th = document.createElement("th");
@@ -1134,7 +1134,7 @@
     Pivot Table core: create PivotData object and call Renderer on it
      */
     $.fn.pivot = function(input, inputOpts, locale) {
-      var defaults, e, localeDefaults, localeStrings, opts, pivotData, result, x;
+      var defaults, e, localeDefaults, localeStrings, opts, pivotData, ref, result, x;
       if (locale == null) {
         locale = "en";
       }
@@ -1154,13 +1154,15 @@
         aggregator: aggregatorTemplates.count()(),
         aggregatorName: "Count",
         sorters: {},
+        labels: {},
         derivedAttributes: {},
         renderer: pivotTableRenderer
       };
       localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings);
       localeDefaults = {
         rendererOptions: {
-          localeStrings: localeStrings
+          localeSettings: localeStrings,
+          labels: (ref = inputOpts.labels) != null ? ref : {}
         },
         localeStrings: localeStrings
       };
@@ -1225,6 +1227,7 @@
         autoSortUnusedAttrs: false,
         onRefresh: null,
         showUI: true,
+        labels: {},
         filter: function() {
           return true;
         },
@@ -1336,7 +1339,7 @@
           unused.addClass('pvtHorizList');
         }
         fn1 = function(attr) {
-          var attrElem, checkContainer, closeFilterBox, controls, filterItem, filterItemExcluded, finalButtons, hasExcludedItem, len2, n, placeholder, ref1, sorter, triangleLink, v, value, valueCount, valueList, values;
+          var attrElem, checkContainer, closeFilterBox, controls, filterItem, filterItemExcluded, finalButtons, hasExcludedItem, len2, n, placeholder, ref1, ref2, ref3, sorter, triangleLink, v, value, valueCount, valueList, values;
           values = (function() {
             var results;
             results = [];
@@ -1347,7 +1350,7 @@
           })();
           hasExcludedItem = false;
           valueList = $("<div>").addClass('pvtFilterBox').hide();
-          valueList.append($("<h4>").append($("<span>").text(attr), $("<span>").addClass("count").text("(" + values.length + ")")));
+          valueList.append($("<h4>").append($("<span>").text((ref1 = opts.labels[attr]) != null ? ref1 : attr), $("<span>").addClass("count").text("(" + values.length + ")")));
           if (values.length > opts.menuLimit) {
             valueList.append($("<p>").html(opts.localeStrings.tooMany));
           } else {
@@ -1365,12 +1368,12 @@
                 filter = $(this).val().toLowerCase().trim();
                 accept_gen = function(prefix, accepted) {
                   return function(v) {
-                    var real_filter, ref1;
+                    var real_filter, ref2;
                     real_filter = filter.substring(prefix.length).trim();
                     if (real_filter.length === 0) {
                       return true;
                     }
-                    return ref1 = Math.sign(sorter(v.toLowerCase(), real_filter)), indexOf.call(accepted, ref1) >= 0;
+                    return ref2 = Math.sign(sorter(v.toLowerCase(), real_filter)), indexOf.call(accepted, ref2) >= 0;
                   };
                 };
                 accept = filter.indexOf(">=") === 0 ? accept_gen(">=", [1, 0]) : filter.indexOf("<=") === 0 ? accept_gen("<=", [-1, 0]) : filter.indexOf(">") === 0 ? accept_gen(">", [1]) : filter.indexOf("<") === 0 ? accept_gen("<", [-1]) : filter.indexOf("~") === 0 ? function(v) {
@@ -1404,9 +1407,9 @@
               });
             }
             checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList);
-            ref1 = values.sort(getSort(opts.sorters, attr));
-            for (n = 0, len2 = ref1.length; n < len2; n++) {
-              value = ref1[n];
+            ref2 = values.sort(getSort(opts.sorters, attr));
+            for (n = 0, len2 = ref2.length; n < len2; n++) {
+              value = ref2[n];
               valueCount = attrValues[attr][value];
               filterItem = $("<label>");
               filterItemExcluded = false;
@@ -1453,14 +1456,14 @@
             return closeFilterBox();
           });
           triangleLink = $("<span>").addClass('pvtTriangle').html(" &#x25BE;").bind("click", function(e) {
-            var left, ref2, top;
-            ref2 = $(e.currentTarget).position(), left = ref2.left, top = ref2.top;
+            var left, ref3, top;
+            ref3 = $(e.currentTarget).position(), left = ref3.left, top = ref3.top;
             return valueList.css({
               left: left + 10,
               top: top + 10
             }).show();
           });
-          attrElem = $("<li>").addClass("axis_" + i).append($("<span>").addClass('pvtAttr').text(attr).data("attrName", attr).append(triangleLink));
+          attrElem = $("<li>").addClass("axis_" + i).append($("<span>").addClass('pvtAttr').text((ref3 = opts.labels[attr]) != null ? ref3 : attr).data("attrName", attr).append(triangleLink));
           if (hasExcludedItem) {
             attrElem.addClass('pvtFilteredAttribute');
           }
@@ -1544,13 +1547,14 @@
         }
         initialRender = true;
         refreshDelayed = (function(_this) {
-          return function() {
-            var exclusions, inclusions, len4, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, ref4, ref5, subopts, t, u, unusedAttrsContainer, vals;
+          return function(first) {
+            var exclusions, inclusions, len4, newDropdown, numInputsToProcess, pivotUIOptions, pvtVals, ref4, ref5, ref6, subopts, t, u, unusedAttrsContainer, vals;
             subopts = {
               derivedAttributes: opts.derivedAttributes,
               localeStrings: opts.localeStrings,
               rendererOptions: opts.rendererOptions,
               sorters: opts.sorters,
+              labels: opts.labels,
               cols: [],
               rows: [],
               dataClass: opts.dataClass
@@ -1581,7 +1585,7 @@
                 });
                 for (u = 0, len4 = shownInAggregators.length; u < len4; u++) {
                   attr = shownInAggregators[u];
-                  newDropdown.append($("<option>").val(attr).text(attr));
+                  newDropdown.append($("<option>").val(attr).text((ref6 = opts.labels[attr]) != null ? ref6 : attr));
                 }
                 pvtVals.append(newDropdown);
               }
@@ -1624,13 +1628,13 @@
               }
             });
             subopts.filter = function(record) {
-              var excludedItems, k, ref6, ref7;
+              var excludedItems, k, ref7, ref8;
               if (!opts.filter(record)) {
                 return false;
               }
               for (k in exclusions) {
                 excludedItems = exclusions[k];
-                if (ref6 = "" + ((ref7 = record[k]) != null ? ref7 : 'null'), indexOf.call(excludedItems, ref6) >= 0) {
+                if (ref7 = "" + ((ref8 = record[k]) != null ? ref8 : 'null'), indexOf.call(excludedItems, ref7) >= 0) {
                   return false;
                 }
               }
@@ -1657,18 +1661,20 @@
               }).appendTo(unusedAttrsContainer);
             }
             pivotTable.css("opacity", 1);
-            if (opts.onRefresh != null) {
+            if ((opts.onRefresh != null) && (first == null)) {
               return opts.onRefresh(pivotUIOptions);
             }
           };
         })(this);
         refresh = (function(_this) {
-          return function() {
+          return function(first) {
             pivotTable.css("opacity", 0.5);
-            return setTimeout(refreshDelayed, 10);
+            return setTimeout((function() {
+              return refreshDelayed(first);
+            }), 10);
           };
         })(this);
-        refresh();
+        refresh(true);
         this.find(".pvtAxisContainer").sortable({
           update: function(e, ui) {
             if (ui.sender == null) {

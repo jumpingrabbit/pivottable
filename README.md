@@ -1,5 +1,8 @@
 [![npm](https://pivottable.js.org/images/npm.svg)](https://www.npmjs.com/package/pivottable) [![cdnjs](https://pivottable.js.org/images/cdnjs.svg)](https://cdnjs.com/libraries/pivottable) [![tests](https://pivottable.js.org/images/tests.svg)](https://pivottable.js.org/tests/) [![license](https://pivottable.js.org/images/license.svg)](https://github.com/nicolaskruchten/pivottable/blob/master/LICENSE.md)
 
+# Build notes
+
+Downgrade node.js to version 6 (Boron), see [issue 2162](https://github.com/gulpjs/gulp/issues/2162).
 
 # PivotTable.js
 

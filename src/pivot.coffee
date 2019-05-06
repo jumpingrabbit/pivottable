@@ -497,7 +497,7 @@ callWithJQuery ($) ->
                 tr.appendChild th
             th = document.createElement("th")
             th.className = "pvtAxisLabel"
-            th.textContent = c
+            th.textContent = opts.labels[c] ? c
             tr.appendChild th
             for own i, colKey of colKeys
                 x = spanSize(colKeys, parseInt(i), parseInt(j))
@@ -523,7 +523,7 @@ callWithJQuery ($) ->
             for own i, r of rowAttrs
                 th = document.createElement("th")
                 th.className = "pvtAxisLabel"
-                th.textContent = r
+                th.textContent = opts.labels[r] ? r
                 tr.appendChild th
             th = document.createElement("th")
             if colAttrs.length ==0
@@ -624,12 +624,16 @@ callWithJQuery ($) ->
             aggregator: aggregatorTemplates.count()()
             aggregatorName: "Count"
             sorters: {}
+            labels: {}
             derivedAttributes: {}
             renderer: pivotTableRenderer
 
         localeStrings = $.extend(true, {}, locales.en.localeStrings, locales[locale].localeStrings)
         localeDefaults =
-            rendererOptions: {localeStrings}
+            rendererOptions: {
+                localeSettings: localeStrings,
+                labels: inputOpts.labels ? {}
+            }
             localeStrings: localeStrings
 
         opts = $.extend(true, {}, localeDefaults, $.extend({}, defaults, inputOpts))
@@ -674,6 +678,7 @@ callWithJQuery ($) ->
             autoSortUnusedAttrs: false
             onRefresh: null
             showUI: true
+            labels: {}
             filter: -> true
             sorters: {}
 
@@ -752,7 +757,7 @@ callWithJQuery ($) ->
                     valueList = $("<div>").addClass('pvtFilterBox').hide()
 
                     valueList.append $("<h4>").append(
-                        $("<span>").text(attr),
+                        $("<span>").text(opts.labels[attr] ? attr),
                         $("<span>").addClass("count").text("(#{values.length})"),
                         )
                     if values.length > opts.menuLimit
@@ -853,7 +858,7 @@ callWithJQuery ($) ->
                             valueList.css(left: left+10, top: top+10).show()
 
                     attrElem = $("<li>").addClass("axis_#{i}")
-                        .append $("<span>").addClass('pvtAttr').text(attr).data("attrName", attr).append(triangleLink)
+                        .append $("<span>").addClass('pvtAttr').text(opts.labels[attr] ? attr).data("attrName", attr).append(triangleLink)
 
                     attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
                     unused.append(attrElem).append(valueList)
@@ -933,12 +938,13 @@ callWithJQuery ($) ->
             initialRender = true
 
             #set up for refreshing
-            refreshDelayed = =>
+            refreshDelayed = (first) =>
                 subopts =
                     derivedAttributes: opts.derivedAttributes
                     localeStrings: opts.localeStrings
                     rendererOptions: opts.rendererOptions
                     sorters: opts.sorters
+                    labels: opts.labels
                     cols: [], rows: []
                     dataClass: opts.dataClass
 
@@ -961,7 +967,7 @@ callWithJQuery ($) ->
                             .append($("<option>"))
                             .bind "change", -> refresh()
                         for attr in shownInAggregators
-                            newDropdown.append($("<option>").val(attr).text(attr))
+                            newDropdown.append($("<option>").val(attr).text(opts.labels[attr] ? attr))
                         pvtVals.append(newDropdown)
 
                 if initialRender
@@ -1025,14 +1031,14 @@ callWithJQuery ($) ->
                         .appendTo unusedAttrsContainer
 
                 pivotTable.css("opacity", 1)
-                opts.onRefresh(pivotUIOptions) if opts.onRefresh?
+                opts.onRefresh(pivotUIOptions) if opts.onRefresh? and !first?
 
-            refresh = =>
+            refresh = (first) =>
                 pivotTable.css("opacity", 0.5)
-                setTimeout refreshDelayed, 10
+                setTimeout ( -> refreshDelayed first), 10
 
             #the very first refresh will actually display the table
-            refresh()
+            refresh(true)
 
             @find(".pvtAxisContainer").sortable
                     update: (e, ui) -> refresh() if not ui.sender?
