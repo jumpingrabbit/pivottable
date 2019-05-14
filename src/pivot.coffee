@@ -714,13 +714,13 @@ callWithJQuery ($) ->
                 recordsProcessed++
 
             #start building the output
-            uiTable = $("<table>", "class": "pvtUi").attr("cellpadding", 5)
+            uiTable = $("<table>", class: "pvtUi").attr("cellpadding", 5)
 
             #renderer control
-            rendererControl = $("<td>").addClass("pvtUiCell")
+            rendererControl = $("<td>", colspan: "3", class: "pvtUiCell pvtUiControls")
 
             renderer = $("<select>")
-                .addClass('pvtRenderer')
+                .addClass("pvtRenderer")
                 .appendTo(rendererControl)
                 .bind "change", -> refresh() #capture reference
             for own x of opts.renderers
@@ -728,22 +728,12 @@ callWithJQuery ($) ->
 
 
             #axis list, including the double-click menu
-            unused = $("<td>").addClass('pvtAxisContainer pvtUnused pvtUiCell')
+            unused = $("<td>", class: "pvtAxisContainer pvtUnused pvtUiCell")
             shownAttributes = (a for a of attrValues when a not in opts.hiddenAttributes)
             shownInAggregators = (c for c in shownAttributes when c not in opts.hiddenFromAggregators)
             shownInDragDrop = (c for c in shownAttributes when c not in opts.hiddenFromDragDrop)
 
-
-            unusedAttrsVerticalAutoOverride = false
-            if opts.unusedAttrsVertical == "auto"
-                unusedAttrsVerticalAutoCutoff = 120 # legacy support
-            else
-                unusedAttrsVerticalAutoCutoff = parseInt opts.unusedAttrsVertical
-
-            if not isNaN(unusedAttrsVerticalAutoCutoff)
-                attrLength = 0
-                attrLength += a.length for a in shownInDragDrop
-                unusedAttrsVerticalAutoOverride = attrLength > unusedAttrsVerticalAutoCutoff
+            unusedAttrsVerticalAutoOverride = true
 
             if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
                 unused.addClass('pvtVertList')
@@ -754,21 +744,29 @@ callWithJQuery ($) ->
                 do (attr) ->
                     values = (v for v of attrValues[attr])
                     hasExcludedItem = false
-                    valueList = $("<div>").addClass('pvtFilterBox').hide()
+                    valueList = $("<div>", class: "pvtFilterBox panel panel-default").hide()
+                    valueHeading = $("<div>", class: "panel-heading")
+                    valueBody = $("<div>", class: "panel-body")
+                    valueFooter = $("<div>", class: "panel-footer")
 
-                    valueList.append $("<h4>").append(
+                    valueList.append valueHeading
+                    valueList.append valueBody
+                    valueList.append valueFooter
+
+                    valueHeading.append $("<h4>", class: "panel-title").append(
                         $("<span>").text(opts.labels[attr] ? attr),
                         $("<span>").addClass("count").text("(#{values.length})"),
-                        )
+                    )
+
                     if values.length > opts.menuLimit
                         valueList.append $("<p>").html(opts.localeStrings.tooMany)
                     else
                         if values.length > 5
-                            controls = $("<p>").appendTo(valueList)
+                            controls = $("<div>", class: "input-group").appendTo(valueBody)
                             sorter = getSort(opts.sorters, attr)
                             placeholder = opts.localeStrings.filterResults
-                            $("<input>", {type: "text"}).appendTo(controls)
-                                .attr({placeholder: placeholder, class: "pvtSearch"})
+                            $("<input>").appendTo(controls)
+                                .attr({placeholder: placeholder, class: "pvtSearch form-control input-sm", type: "text"})
                                 .bind "keyup", ->
                                     filter = $(this).val().toLowerCase().trim()
                                     accept_gen = (prefix, accepted) -> (v) ->
@@ -790,21 +788,21 @@ callWithJQuery ($) ->
                                             $(this).parent().parent().show()
                                         else
                                             $(this).parent().parent().hide()
-                            controls.append $("<br>")
-                            $("<button>", {type:"button"}).appendTo(controls)
-                                .html(opts.localeStrings.selectAll)
+                            controlsButtons = $("<span>", class: "input-group-btn").appendTo(controls)
+                            $("<button>", type: "button", class: "btn btn-default btn-sm", title: opts.localeStrings.selectAll).appendTo(controlsButtons)
+                                .append($("<i>", class: "far fa-fw fa-check-square"))
                                 .bind "click", ->
                                     valueList.find("input:visible:not(:checked)")
                                         .prop("checked", true).toggleClass("changed")
                                     return false
-                            $("<button>", {type:"button"}).appendTo(controls)
-                                .html(opts.localeStrings.selectNone)
+                            $("<button>", type:"button", class: "btn btn-default btn-sm", title: opts.localeStrings.selectNone).appendTo(controlsButtons)
+                                .append($("<i>", class: "far fa-fw fa-square"))
                                 .bind "click", ->
                                     valueList.find("input:visible:checked")
                                         .prop("checked", false).toggleClass("changed")
                                     return false
 
-                        checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueList)
+                        checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueBody)
 
                         for value in values.sort(getSort(opts.sorters, attr))
                              valueCount = attrValues[attr][value]
@@ -822,7 +820,7 @@ callWithJQuery ($) ->
                                 .bind "change", -> $(this).toggleClass("changed")
                              filterItem.append $("<span>").addClass("value").text(value)
                              filterItem.append $("<span>").addClass("count").text("("+valueCount+")")
-                             checkContainer.append $("<p>").append(filterItem)
+                             checkContainer.append $("<div>", class: "checkbox").append(filterItem)
 
                     closeFilterBox = ->
                         if valueList.find("[type='checkbox']").length >
@@ -832,19 +830,20 @@ callWithJQuery ($) ->
                                 attrElem.removeClass "pvtFilteredAttribute"
 
                             valueList.find('.pvtSearch').val('')
-                            valueList.find('.pvtCheckContainer p').show()
+                            valueList.find('.pvtCheckContainer div.checkbox').show()
                             valueList.hide()
 
-                    finalButtons = $("<p>").appendTo(valueList)
+                    finalButtons = $("<div>", class: "text-right").appendTo(valueFooter)
 
                     if values.length <= opts.menuLimit
-                        $("<button>", {type: "button"}).text(opts.localeStrings.apply)
+                        $("<button>", type: "button", class: "btn btn-default btn-sm").text(opts.localeStrings.apply)
                             .appendTo(finalButtons).bind "click", ->
                                 if valueList.find(".changed").removeClass("changed").length
                                     refresh()
                                 closeFilterBox()
+                        $("<span>").html('&nbsp;').appendTo(finalButtons)
 
-                    $("<button>", {type: "button"}).text(opts.localeStrings.cancel)
+                    $("<button>", type: "button", class: "btn btn-default btn-sm").text(opts.localeStrings.cancel)
                         .appendTo(finalButtons).bind "click", ->
                             valueList.find(".changed:checked")
                                 .removeClass("changed").prop("checked", false)
@@ -852,17 +851,18 @@ callWithJQuery ($) ->
                                 .removeClass("changed").prop("checked", true)
                             closeFilterBox()
 
-                    triangleLink = $("<span>").addClass('pvtTriangle')
-                        .html(" &#x25BE;").bind "click", (e) ->
+                    triangleLink = $("<i>", class: "fas fa-fw fa-caret-down").addClass('pvtTriangle')
+                        .bind "click", (e) ->
                             {left, top} = $(e.currentTarget).position()
                             valueList.css(left: left+10, top: top+10).show()
 
                     attrElem = $("<li>").addClass("axis_#{i}")
-                        .append $("<span>").addClass('pvtAttr').text(opts.labels[attr] ? attr).data("attrName", attr).append(triangleLink)
+                        .append $("<span>").addClass('label label-default pvtAttr').attr("title", opts.labels[attr] ? attr).text(opts.labels[attr] ? attr).data("attrName", attr).append(triangleLink)
 
                     attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
                     unused.append(attrElem).append(valueList)
 
+            tr0 = $("<tr>").appendTo(uiTable)
             tr1 = $("<tr>").appendTo(uiTable)
 
             #aggregator menu and value area
@@ -872,31 +872,61 @@ callWithJQuery ($) ->
             for own x of opts.aggregators
                 aggregator.append $("<option>").val(x).html(x)
 
-            ordering =
-                key_a_to_z:   {rowSymbol: "&varr;", colSymbol: "&harr;", next: "value_a_to_z"}
-                value_a_to_z: {rowSymbol: "&darr;", colSymbol: "&rarr;", next: "value_z_to_a"}
-                value_z_to_a: {rowSymbol: "&uarr;", colSymbol: "&larr;", next: "key_a_to_z"}
+            rendererControl
+                .append(" ")
+                .append(aggregator)
 
-            rowOrderArrow = $("<a>", role: "button").addClass("pvtRowOrder")
+            ordering =
+                key_a_to_z:   {rowSymbol: $("<i>", class: "far fa-fw fa-arrows-alt-v"),         colSymbol: $("<i>", class: "far fa-fw fa-arrows-alt-h"),         next: "value_a_to_z"}
+                value_a_to_z: {rowSymbol: $("<i>", class: "far fa-fw fa-long-arrow-alt-down"),  colSymbol: $("<i>", class: "far fa-fw fa-long-arrow-alt-right"), next: "value_z_to_a"}
+                value_z_to_a: {rowSymbol: $("<i>", class: "far fa-fw fa-long-arrow-alt-up"),    colSymbol: $("<i>", class: "far fa-fw fa-long-arrow-alt-left"),  next: "key_a_to_z"}
+
+            rowOrderArrow = $("<button>", class: "btn btn-default btn-xs")#.addClass("pvtRowOrder")
                 .data("order", opts.rowOrder).html(ordering[opts.rowOrder].rowSymbol)
                 .bind "click", ->
                     $(this).data("order", ordering[$(this).data("order")].next)
                     $(this).html(ordering[$(this).data("order")].rowSymbol)
                     refresh()
 
-            colOrderArrow = $("<a>", role: "button").addClass("pvtColOrder")
+            colOrderArrow = $("<button>", class: "btn btn-default btn-xs")#.addClass("pvtColOrder")
                 .data("order", opts.colOrder).html(ordering[opts.colOrder].colSymbol)
                 .bind "click", ->
                     $(this).data("order", ordering[$(this).data("order")].next)
                     $(this).html(ordering[$(this).data("order")].colSymbol)
                     refresh()
 
-            $("<td>").addClass('pvtVals pvtUiCell')
+            orderGroup = $("<div>", class: "btn-group pull-right", role: "group")
+                .append(rowOrderArrow)
+                .append(colOrderArrow)
+
+            unusedVisibility = $("<button>", class: "btn btn-default btn-xs active")
+                .append($("<i>", class: "far fa-fw fa-ruler-vertical fa-flip-horizontal"))
+                .bind "click", ->
+                    $(this).toggleClass('active')
+                    $(".pvtUnused").toggle()
+                    pvtRows = $(".pvtRows")
+                    if pvtRows.attr("colspan") == "2"
+                        pvtRows.attr("colspan", 1)
+                    else
+                        pvtRows.attr("colspan", 2) 
+                        
+            rulesVisibility = $("<button>", class: "btn btn-default btn-xs active")
+                .append($("<i>", class: "far fa-fw fa-ruler-combined fa-flip-vertical"))
+                .bind "click", ->
+                    $(this).toggleClass('active')
+                    $(".pvtRows, .pvtCols").toggle()
+
+            panelsGroup = $("<div>", class: "btn-group", role: "group")
+                .append(unusedVisibility)
+                .append(rulesVisibility)
+
+            controlsToolbar = $("<div>", class: "btn-toolbar")
+                .append(panelsGroup)
+                .append(orderGroup)
+
+            $("<td>", "colspan": "2").addClass('pvtVals pvtUiCell')
               .appendTo(tr1)
-              .append(aggregator)
-              .append(rowOrderArrow)
-              .append(colOrderArrow)
-              .append($("<br>"))
+              .append(controlsToolbar)
 
             #column axes
             $("<td>").addClass('pvtAxisContainer pvtHorizList pvtCols pvtUiCell').appendTo(tr1)
@@ -915,7 +945,7 @@ callWithJQuery ($) ->
             #finally the renderer dropdown and unused attribs are inserted at the requested location
             if opts.unusedAttrsVertical == true or unusedAttrsVerticalAutoOverride
                 uiTable.find('tr:nth-child(1)').prepend rendererControl
-                uiTable.find('tr:nth-child(2)').prepend unused
+                uiTable.find('tr:nth-child(3)').prepend unused
             else
                 uiTable.prepend $("<tr>").append(rendererControl).append(unused)
 
@@ -952,7 +982,7 @@ callWithJQuery ($) ->
                 vals = []
                 @find(".pvtRows li span.pvtAttr").each -> subopts.rows.push $(this).data("attrName")
                 @find(".pvtCols li span.pvtAttr").each -> subopts.cols.push $(this).data("attrName")
-                @find(".pvtVals select.pvtAttrDropdown").each ->
+                @find(".pvtUiControls select.pvtAttrDropdown").each ->
                     if numInputsToProcess == 0
                         $(this).remove()
                     else
@@ -960,7 +990,7 @@ callWithJQuery ($) ->
                         vals.push $(this).val() if $(this).val() != ""
 
                 if numInputsToProcess != 0
-                    pvtVals = @find(".pvtVals")
+                    pvtUiCell = @find(".pvtUiControls")
                     for x in [0...numInputsToProcess]
                         newDropdown = $("<select>")
                             .addClass('pvtAttrDropdown')
@@ -968,12 +998,17 @@ callWithJQuery ($) ->
                             .bind "change", -> refresh()
                         for attr in shownInAggregators
                             newDropdown.append($("<option>").val(attr).text(opts.labels[attr] ? attr))
-                        pvtVals.append(newDropdown)
+                        console.log(localeStrings.by)
+                        pvtUiCell
+                            .append(" ")
+                            .append(document.createTextNode(localeStrings.by))
+                            .append(" ")
+                            .append(newDropdown)
 
                 if initialRender
                     vals = opts.vals
                     i = 0
-                    @find(".pvtVals select.pvtAttrDropdown").each ->
+                    @find(".pvtUiControls select.pvtAttrDropdown").each ->
                         $(this).val vals[i]
                         i++
                     initialRender = false
@@ -1045,6 +1080,13 @@ callWithJQuery ($) ->
                     connectWith: @find(".pvtAxisContainer")
                     items: 'li'
                     placeholder: 'pvtPlaceholder'
+
+            $(".pvtUi .pvtRows, .pvtUi .pvtUnused").resizable({
+                handles: "e",
+                resize: (event, ui) ->
+                    if ui.size.width > 150
+                        event.target.style.maxWidth = ui.size.width + 'px'
+            })
         catch e
             console.error(e.stack) if console?
             @html opts.localeStrings.uiRenderError
