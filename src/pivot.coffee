@@ -857,7 +857,7 @@ callWithJQuery ($) ->
 
                     triangleLink = $("<i>", class: "fas fa-fw fa-caret-down").addClass('pvtTriangle')
                         .bind "click", (e) ->
-                            {left, top} = $(e.currentTarget).offset()
+                            {left, top} = $(e.currentTarget).position()
                             valueList.css(left: left + 10, top: top + 10).show()
 
                     attrElem = $("<li>").addClass("axis_#{i}")
