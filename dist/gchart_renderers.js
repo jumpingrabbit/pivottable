@@ -164,14 +164,7 @@
           options: options
         });
         wrapper.draw(result[0]);
-        result.bind("dblclick", function() {
-          var editor;
-          editor = new google.visualization.ChartEditor();
-          google.visualization.events.addListener(editor, 'ok', function() {
-            return editor.getChartWrapper().draw(result[0]);
-          });
-          return editor.openDialog(wrapper);
-        });
+        wrapper.draw(result[0]);
         return result;
       };
     };

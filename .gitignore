@@ -3,6 +3,7 @@ bower_components
 .idea/
 Rdatasets
 /vendor/
+/css
 composer.lock
 
 yarn.lock
