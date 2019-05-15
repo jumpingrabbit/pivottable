@@ -1491,7 +1491,7 @@
             "class": "fas fa-fw fa-caret-down"
           }).addClass('pvtTriangle').bind("click", function(e) {
             var left, ref3, top;
-            ref3 = $(e.currentTarget).offset(), left = ref3.left, top = ref3.top;
+            ref3 = $(e.currentTarget).position(), left = ref3.left, top = ref3.top;
             return valueList.css({
               left: left + 10,
               top: top + 10
