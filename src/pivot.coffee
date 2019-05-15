@@ -679,6 +679,10 @@ callWithJQuery ($) ->
             onRefresh: null
             showUI: true
             labels: {}
+            controls: {
+                unused: false
+                rules: false
+            }
             filter: -> true
             sorters: {}
 
@@ -783,11 +787,11 @@ callWithJQuery ($) ->
                                                 v.toLowerCase().match(filter.substring(1))
                                         else (v) -> v.toLowerCase().indexOf(filter) != -1
 
-                                    valueList.find('.pvtCheckContainer p label span.value').each ->
+                                    valueList.find('.pvtCheckContainer label span.value').each ->
                                         if accept($(this).text())
-                                            $(this).parent().parent().show()
+                                            $(this).parent().parent().addClass('pvtFilterIn').show()
                                         else
-                                            $(this).parent().parent().hide()
+                                            $(this).parent().parent().removeClass("pvtFilterIn").hide()
                             controlsButtons = $("<span>", class: "input-group-btn").appendTo(controls)
                             $("<button>", type: "button", class: "btn btn-default btn-sm", title: opts.localeStrings.selectAll).appendTo(controlsButtons)
                                 .append($("<i>", class: "far fa-fw fa-check-square"))
@@ -802,7 +806,7 @@ callWithJQuery ($) ->
                                         .prop("checked", false).toggleClass("changed")
                                     return false
 
-                        checkContainer = $("<div>").addClass("pvtCheckContainer").appendTo(valueBody)
+                        checkContainer = $("<div>", class: "pvtCheckContainer").appendTo(valueBody)
 
                         for value in values.sort(getSort(opts.sorters, attr))
                              valueCount = attrValues[attr][value]
@@ -853,14 +857,15 @@ callWithJQuery ($) ->
 
                     triangleLink = $("<i>", class: "fas fa-fw fa-caret-down").addClass('pvtTriangle')
                         .bind "click", (e) ->
-                            {left, top} = $(e.currentTarget).position()
-                            valueList.css(left: left+10, top: top+10).show()
+                            {left, top} = $(e.currentTarget).offset()
+                            valueList.css(left: left + 10, top: top + 10).show()
 
                     attrElem = $("<li>").addClass("axis_#{i}")
                         .append $("<span>").addClass('label label-default pvtAttr').attr("title", opts.labels[attr] ? attr).text(opts.labels[attr] ? attr).data("attrName", attr).append(triangleLink)
 
                     attrElem.addClass('pvtFilteredAttribute') if hasExcludedItem
-                    unused.append(attrElem).append(valueList)
+                    unused.append(attrElem)
+                    rendererControl.append(valueList)
 
             tr0 = $("<tr>").appendTo(uiTable)
             tr1 = $("<tr>").appendTo(uiTable)
@@ -895,11 +900,11 @@ callWithJQuery ($) ->
                     $(this).html(ordering[$(this).data("order")].colSymbol)
                     refresh()
 
-            orderGroup = $("<div>", class: "btn-group pull-right", role: "group")
+            orderGroup = $("<div>", class: "btn-group", role: "group")
                 .append(rowOrderArrow)
                 .append(colOrderArrow)
 
-            unusedVisibility = $("<button>", class: "btn btn-default btn-xs active")
+            unusedVisibility = $("<button>", class: "btn btn-default btn-xs")
                 .append($("<i>", class: "far fa-fw fa-ruler-vertical fa-flip-horizontal"))
                 .bind "click", ->
                     $(this).toggleClass('active')
@@ -908,13 +913,15 @@ callWithJQuery ($) ->
                     if pvtRows.attr("colspan") == "2"
                         pvtRows.attr("colspan", 1)
                     else
-                        pvtRows.attr("colspan", 2) 
+                        pvtRows.attr("colspan", 2)
+            unusedVisibility.addClass("active") if opts.controls.unused
                         
-            rulesVisibility = $("<button>", class: "btn btn-default btn-xs active")
+            rulesVisibility = $("<button>", class: "btn btn-default btn-xs")
                 .append($("<i>", class: "far fa-fw fa-ruler-combined fa-flip-vertical"))
                 .bind "click", ->
                     $(this).toggleClass('active')
                     $(".pvtRows, .pvtCols").toggle()
+            rulesVisibility.addClass("active") if opts.controls.rules
 
             panelsGroup = $("<div>", class: "btn-group", role: "group")
                 .append(unusedVisibility)
@@ -931,9 +938,8 @@ callWithJQuery ($) ->
             #column axes
             $("<td>").addClass('pvtAxisContainer pvtHorizList pvtCols pvtUiCell').appendTo(tr1)
 
-            tr2 = $("<tr>").appendTo(uiTable)
-
             #row axes
+            tr2 = $("<tr>").appendTo(uiTable)
             tr2.append $("<td>").addClass('pvtAxisContainer pvtRows pvtUiCell').attr("valign", "top")
 
             #the actual pivot table container
@@ -951,6 +957,10 @@ callWithJQuery ($) ->
 
             #render the UI in its default state
             @html uiTable
+
+            $(".pvtRows, .pvtCols").hide() if !opts.controls.rules
+            $(".pvtUnused").hide() if !opts.controls.unused
+            $(".pvtRows").attr("colspan", 2) if !opts.controls.unused
 
             #set up the UI initial state as requested by moving elements around
 
@@ -985,6 +995,7 @@ callWithJQuery ($) ->
                 @find(".pvtUiControls select.pvtAttrDropdown").each ->
                     if numInputsToProcess == 0
                         $(this).remove()
+                        $(this).prev(".pvtAttrDropdownBy").remove()
                     else
                         numInputsToProcess--
                         vals.push $(this).val() if $(this).val() != ""
@@ -998,10 +1009,9 @@ callWithJQuery ($) ->
                             .bind "change", -> refresh()
                         for attr in shownInAggregators
                             newDropdown.append($("<option>").val(attr).text(opts.labels[attr] ? attr))
-                        console.log(localeStrings.by)
                         pvtUiCell
                             .append(" ")
-                            .append(document.createTextNode(localeStrings.by))
+                            .append($("<span>", class: "pvtAttrDropdownBy").text(localeStrings.by))
                             .append(" ")
                             .append(newDropdown)
 
@@ -1081,12 +1091,12 @@ callWithJQuery ($) ->
                     items: 'li'
                     placeholder: 'pvtPlaceholder'
 
-            $(".pvtUi .pvtRows, .pvtUi .pvtUnused").resizable({
-                handles: "e",
-                resize: (event, ui) ->
-                    if ui.size.width > 150
-                        event.target.style.maxWidth = ui.size.width + 'px'
-            })
+            # $(".pvtUi .pvtRows, .pvtUi .pvtUnused").resizable({
+            #     handles: "e",
+            #     resize: (event, ui) ->
+            #         if ui.size.width > 150
+            #             event.target.style.maxWidth = ui.size.width + 'px'
+            # })
         catch e
             console.error(e.stack) if console?
             @html opts.localeStrings.uiRenderError

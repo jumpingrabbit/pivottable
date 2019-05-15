@@ -3,8 +3,15 @@
     <head>
         <title>Pivot Demo</title>
         <!-- external libs from cdnjs -->
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css" />
+
+        <link rel="stylesheet" type="text/css" href="/css/fontawesome/css/all.css" />
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap-custom.css">
+        <link rel="stylesheet" type="text/css" href="/css/custom-dashboard.css">
 
         <!-- PivotTable.js libs from ../dist -->
         <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
@@ -39,7 +46,11 @@
 
         <p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
 
-        <div id="output" style="margin: 30px;"></div>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="output" style="margin: 30px;"></div>
+            </div>
+        </div>
 
     </body>
 </html>

@@ -1,4 +1,5 @@
 .pvtUi {
+	width: 100%;
 	color: #333;
 }
 
@@ -134,9 +135,10 @@ table.pvtTable tbody tr td {
 	font-style: italic;
 }
 
-.pvtUnused, .pvtRows {
+.pvtUnused,
+.pvtRows {
 	max-width: 200px;
-	width: 200px;
+	min-width: 200px;
 }
 
 .pvtFilterBox {
@@ -144,7 +146,7 @@ table.pvtTable tbody tr td {
 	width: 300px;
 	position: absolute;
 	text-align: center;
-	box-shadow: 0 6px 12px rgba(0,0,0,.175)
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
 }
 
 .pvtFilterBox label {
@@ -169,8 +171,9 @@ table.pvtTable tbody tr td {
 	max-height: 250px;
 }
 
-.pvtCheckContainer p {
-	margin: 5px;
+.pvtCheckContainer .checkbox {
+	margin-top: 8px;
+	margin-bottom: 0;
 }
 
 .pvtRendererArea {
