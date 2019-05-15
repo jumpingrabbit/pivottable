@@ -1490,11 +1490,12 @@
           triangleLink = $("<i>", {
             "class": "fas fa-fw fa-caret-down"
           }).addClass('pvtTriangle').bind("click", function(e) {
-            var left, ref3, top;
-            ref3 = $(e.currentTarget).offset(), left = ref3.left, top = ref3.top;
+            var UI, el;
+            el = $(e.currentTarget).offset();
+            UI = $(".pvtUi").offset();
             return valueList.css({
-              left: left + 10,
-              top: top + 10
+              left: el.left - UI.left + 10,
+              top: el.top - UI.top + 10
             }).show();
           });
           attrElem = $("<li>").addClass("axis_" + i).append($("<span>").addClass('label label-default pvtAttr').attr("title", (ref4 = opts.labels[attr]) != null ? ref4 : attr).text((ref3 = opts.labels[attr]) != null ? ref3 : attr).data("attrName", attr).append(triangleLink));
@@ -1572,14 +1573,14 @@
         }).append($("<i>", {
           "class": "far fa-fw fa-ruler-vertical fa-flip-horizontal"
         })).bind("click", function() {
-          var pvtRows;
+          var pvtVals;
           $(this).toggleClass('active');
           $(".pvtUnused").toggle();
-          pvtRows = $(".pvtRows");
-          if (pvtRows.attr("colspan") === "2") {
-            return pvtRows.attr("colspan", 1);
+          pvtVals = $(".pvtVals");
+          if (pvtVals.attr("colspan") === "2") {
+            return pvtVals.attr("colspan", 1);
           } else {
-            return pvtRows.attr("colspan", 2);
+            return pvtVals.attr("colspan", 2);
           }
         });
         if (opts.controls.unused) {
@@ -1604,8 +1605,8 @@
           "class": "btn-toolbar"
         }).append(panelsGroup).append(orderGroup);
         $("<td>", {
-          "colspan": "2"
-        }).addClass('pvtVals pvtUiCell').appendTo(tr1).append(controlsToolbar);
+          "class": "pvtVals pvtUiCell"
+        }).appendTo(tr1).append(controlsToolbar);
         $("<td>").addClass('pvtAxisContainer pvtHorizList pvtCols pvtUiCell').appendTo(tr1);
         tr2 = $("<tr>").appendTo(uiTable);
         tr2.append($("<td>").addClass('pvtAxisContainer pvtRows pvtUiCell').attr("valign", "top"));
@@ -1623,8 +1624,8 @@
         if (!opts.controls.unused) {
           $(".pvtUnused").hide();
         }
-        if (!opts.controls.unused) {
-          $(".pvtRows").attr("colspan", 2);
+        if (opts.controls.unused) {
+          $(".pvtVals").attr("colspan", 2);
         }
         ref2 = opts.cols;
         for (l = 0, len1 = ref2.length; l < len1; l++) {

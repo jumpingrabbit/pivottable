@@ -1,6 +1,7 @@
 .pvtUi {
 	width: 100%;
 	color: #333;
+	position: relative;
 }
 
 table.pvtTable {
@@ -139,6 +140,7 @@ table.pvtTable tbody tr td {
 .pvtRows {
 	max-width: 200px;
 	min-width: 200px;
+	width: 200px;
 }
 
 .pvtFilterBox {
