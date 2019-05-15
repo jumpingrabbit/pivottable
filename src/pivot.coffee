@@ -857,8 +857,9 @@ callWithJQuery ($) ->
 
                     triangleLink = $("<i>", class: "fas fa-fw fa-caret-down").addClass('pvtTriangle')
                         .bind "click", (e) ->
-                            {left, top} = $(e.currentTarget).position()
-                            valueList.css(left: left + 10, top: top + 10).show()
+                            el = $(e.currentTarget).offset()
+                            UI = $(".pvtUi").offset()
+                            valueList.css(left: el.left - UI.left + 10, top: el.top - UI.top + 10).show()
 
                     attrElem = $("<li>").addClass("axis_#{i}")
                         .append $("<span>").addClass('label label-default pvtAttr').attr("title", opts.labels[attr] ? attr).text(opts.labels[attr] ? attr).data("attrName", attr).append(triangleLink)
@@ -909,11 +910,11 @@ callWithJQuery ($) ->
                 .bind "click", ->
                     $(this).toggleClass('active')
                     $(".pvtUnused").toggle()
-                    pvtRows = $(".pvtRows")
-                    if pvtRows.attr("colspan") == "2"
-                        pvtRows.attr("colspan", 1)
+                    pvtVals = $(".pvtVals")
+                    if pvtVals.attr("colspan") == "2"
+                        pvtVals.attr("colspan", 1)
                     else
-                        pvtRows.attr("colspan", 2)
+                        pvtVals.attr("colspan", 2)
             unusedVisibility.addClass("active") if opts.controls.unused
                         
             rulesVisibility = $("<button>", class: "btn btn-default btn-xs")
@@ -931,7 +932,7 @@ callWithJQuery ($) ->
                 .append(panelsGroup)
                 .append(orderGroup)
 
-            $("<td>", "colspan": "2").addClass('pvtVals pvtUiCell')
+            $("<td>", class: "pvtVals pvtUiCell")
               .appendTo(tr1)
               .append(controlsToolbar)
 
@@ -960,7 +961,7 @@ callWithJQuery ($) ->
 
             $(".pvtRows, .pvtCols").hide() if !opts.controls.rules
             $(".pvtUnused").hide() if !opts.controls.unused
-            $(".pvtRows").attr("colspan", 2) if !opts.controls.unused
+            $(".pvtVals").attr("colspan", 2) if opts.controls.unused
 
             #set up the UI initial state as requested by moving elements around
 
