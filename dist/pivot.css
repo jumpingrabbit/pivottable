@@ -1,7 +1,15 @@
+.pvtVisible {
+	overflow-y: visible;
+	position: relative;
+}
+.pvtResponsive {
+	overflow-x: auto;
+	padding: 1px;
+}
+
 .pvtUi {
 	width: 100%;
 	color: #333;
-	position: relative;
 }
 
 table.pvtTable {

@@ -1197,7 +1197,7 @@
     Pivot Table UI: calls Pivot Table core above with options set by user
      */
     $.fn.pivotUI = function(input, inputOpts, overwrite, locale) {
-      var a, aggregator, attr, attrValues, c, colOrderArrow, controlsToolbar, defaults, e, existingOpts, fn1, i, initialRender, l, len1, len2, localeDefaults, localeStrings, materializedInput, n, opts, orderGroup, ordering, panelsGroup, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, rowOrderArrow, rulesVisibility, shownAttributes, shownInAggregators, shownInDragDrop, tr0, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoOverride, unusedVisibility, x;
+      var a, aggregator, attr, attrValues, c, colOrderArrow, controlsToolbar, defaults, e, existingOpts, fn1, i, initialRender, l, len1, len2, localeDefaults, localeStrings, materializedInput, n, opts, orderGroup, ordering, panelsGroup, pivotTable, recordsProcessed, ref, ref1, ref2, ref3, refresh, refreshDelayed, renderer, rendererControl, responsive, rowOrderArrow, rulesVisibility, shownAttributes, shownInAggregators, shownInDragDrop, tr0, tr1, tr2, uiTable, unused, unusedAttrsVerticalAutoOverride, unusedVisibility, visible, x;
       if (overwrite == null) {
         overwrite = false;
       }
@@ -1490,12 +1490,23 @@
           triangleLink = $("<i>", {
             "class": "fas fa-fw fa-caret-down"
           }).addClass('pvtTriangle').bind("click", function(e) {
-            var UI, el;
-            el = $(e.currentTarget).offset();
-            UI = $(".pvtUi").offset();
+            var UI, UIHeight, UIOffset, space, targetOffset, top, valueListHeight;
+            UI = $(".pvtUi");
+            UIHeight = UI.height();
+            UIOffset = UI.offset();
+            targetOffset = $(e.currentTarget).offset();
+            valueListHeight = valueList.height();
+            space = UIHeight - (targetOffset.top - UIOffset.top);
+            if (space > valueListHeight) {
+              top = targetOffset.top - UIOffset.top;
+            } else if (space > valueListHeight / 2) {
+              top = targetOffset.top - UIOffset.top - valueListHeight / 2;
+            } else {
+              top = targetOffset.top - UIOffset.top - valueListHeight;
+            }
             return valueList.css({
-              left: el.left - UI.left + 10,
-              top: el.top - UI.top + 10
+              left: targetOffset.left - UIOffset.left + 10,
+              top: top + 10
             }).show();
           });
           attrElem = $("<li>").addClass("axis_" + i).append($("<span>").addClass('label label-default pvtAttr').attr("title", (ref4 = opts.labels[attr]) != null ? ref4 : attr).text((ref3 = opts.labels[attr]) != null ? ref3 : attr).data("attrName", attr).append(triangleLink));
@@ -1617,7 +1628,14 @@
         } else {
           uiTable.prepend($("<tr>").append(rendererControl).append(unused));
         }
-        this.html(uiTable);
+        visible = $("<div>", {
+          "class": "pvtVisible"
+        });
+        responsive = $("<div>", {
+          "class": "pvtResponsive"
+        }).appendTo(visible);
+        uiTable.appendTo(responsive);
+        this.html(visible);
         if (!opts.controls.rules) {
           $(".pvtRows, .pvtCols").hide();
         }

@@ -857,9 +857,21 @@ callWithJQuery ($) ->
 
                     triangleLink = $("<i>", class: "fas fa-fw fa-caret-down").addClass('pvtTriangle')
                         .bind "click", (e) ->
-                            el = $(e.currentTarget).offset()
-                            UI = $(".pvtUi").offset()
-                            valueList.css(left: el.left - UI.left + 10, top: el.top - UI.top + 10).show()
+                            UI = $(".pvtUi")
+                            UIHeight = UI.height()
+                            UIOffset = UI.offset()
+                            targetOffset = $(e.currentTarget).offset()
+                            valueListHeight = valueList.height()
+                            space = UIHeight - (targetOffset.top - UIOffset.top)
+
+                            if space > valueListHeight
+                                top = targetOffset.top - UIOffset.top
+                            else if space > valueListHeight / 2
+                                top = targetOffset.top - UIOffset.top - valueListHeight / 2
+                            else
+                                top = targetOffset.top - UIOffset.top - valueListHeight
+                                
+                            valueList.css(left: targetOffset.left - UIOffset.left + 10, top: top + 10).show()
 
                     attrElem = $("<li>").addClass("axis_#{i}")
                         .append $("<span>").addClass('label label-default pvtAttr').attr("title", opts.labels[attr] ? attr).text(opts.labels[attr] ? attr).data("attrName", attr).append(triangleLink)
@@ -957,7 +969,11 @@ callWithJQuery ($) ->
                 uiTable.prepend $("<tr>").append(rendererControl).append(unused)
 
             #render the UI in its default state
-            @html uiTable
+            visible = $("<div>", class: "pvtVisible")
+            responsive = $("<div>", class: "pvtResponsive").appendTo(visible)
+            uiTable.appendTo(responsive)
+            
+            @html visible
 
             $(".pvtRows, .pvtCols").hide() if !opts.controls.rules
             $(".pvtUnused").hide() if !opts.controls.unused
