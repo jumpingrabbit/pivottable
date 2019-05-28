@@ -1688,8 +1688,8 @@
             });
             _this.find(".pvtUiControls select.pvtAttrDropdown").each(function() {
               if (numInputsToProcess === 0) {
-                $(this).remove();
-                return $(this).prev(".pvtAttrDropdownBy").remove();
+                $(this).prev(".pvtAttrDropdownBy").remove();
+                return $(this).remove();
               } else {
                 numInputsToProcess--;
                 if ($(this).val() !== "") {
