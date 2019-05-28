@@ -1011,8 +1011,8 @@ callWithJQuery ($) ->
                 @find(".pvtCols li span.pvtAttr").each -> subopts.cols.push $(this).data("attrName")
                 @find(".pvtUiControls select.pvtAttrDropdown").each ->
                     if numInputsToProcess == 0
-                        $(this).remove()
                         $(this).prev(".pvtAttrDropdownBy").remove()
+                        $(this).remove()
                     else
                         numInputsToProcess--
                         vals.push $(this).val() if $(this).val() != ""
