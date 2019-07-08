@@ -1190,7 +1190,7 @@
       while (x.hasChildNodes()) {
         x.removeChild(x.lastChild);
       }
-      return this.append(result);
+      return result;
     };
 
     /*
@@ -1667,7 +1667,7 @@
         initialRender = true;
         refreshDelayed = (function(_this) {
           return function(first) {
-            var exclusions, inclusions, len3, newDropdown, numInputsToProcess, o, pivotUIOptions, pvtUiCell, ref4, ref5, ref6, subopts, t, unusedAttrsContainer, vals;
+            var exclusions, inclusions, len3, newDropdown, numInputsToProcess, o, pivotUIOptions, pvtUiCell, ref4, ref5, ref6, ref7, result, subopts, t, unusedAttrsContainer, vals, wrapper;
             subopts = {
               derivedAttributes: opts.derivedAttributes,
               localeStrings: opts.localeStrings,
@@ -1762,7 +1762,13 @@
               }
               return true;
             };
-            pivotTable.pivot(materializedInput, subopts);
+            if (["Line Chart", "Bar Chart", "Stacked Bar Chart", "Area Chart", "Scatter Chart", "Pie Chart"].indexOf(renderer.val()) > -1) {
+              ref7 = pivotTable.pivot(materializedInput, subopts), result = ref7.result, wrapper = ref7.wrapper;
+              pivotTable.append(result);
+              wrapper.draw(result[0]);
+            } else {
+              pivotTable.append(pivotTable.pivot(materializedInput, subopts));
+            }
             pivotUIOptions = $.extend({}, opts, {
               cols: subopts.cols,
               rows: subopts.rows,

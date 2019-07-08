@@ -163,9 +163,10 @@
           chartType: chartType,
           options: options
         });
-        wrapper.draw(result[0]);
-        wrapper.draw(result[0]);
-        return result;
+        return {
+          result: result,
+          wrapper: wrapper
+        };
       };
     };
     return $.pivotUtilities.gchart_renderers = {
