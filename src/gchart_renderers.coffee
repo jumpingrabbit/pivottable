@@ -98,14 +98,14 @@ callWithJQuery ($) ->
 
         result = $("<div>").css(width: "100%", height: "100%")
         wrapper = new google.visualization.ChartWrapper {dataTable, chartType, options}
-        wrapper.draw(result[0])
-        wrapper.draw(result[0])
+        
         # result.bind "dblclick", ->
         #     editor = new google.visualization.ChartEditor()
         #     google.visualization.events.addListener editor, 'ok', ->
         #         editor.getChartWrapper().draw(result[0])
         #     editor.openDialog(wrapper)
-        return result
+
+        return {result, wrapper}
 
     $.pivotUtilities.gchart_renderers =
         "Line Chart": makeGoogleChart("LineChart")

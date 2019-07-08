@@ -1,71 +1,104 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Pivot Demo</title>
-        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<head>
+		<title>Pivot Demo</title>
+		<script
+			type="text/javascript"
+			src="https://www.google.com/jsapi"
+		></script>
 
-        <!-- external libs from cdnjs -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+		<!-- external libs from cdnjs -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css" />
-        
-        <link rel="stylesheet" type="text/css" href="/css/fontawesome/css/all.css" />
-        <link rel="stylesheet" type="text/css" href="/css/bootstrap-custom.css" />
-        <link rel="stylesheet" type="text/css" href="/css/custom-dashboard.css" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css"
+		/>
 
-        <!-- PivotTable.js libs from ../dist -->
-        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
-        <script type="text/javascript" src="../dist/pivot.js"></script>
-        <script type="text/javascript" src="../dist/gchart_renderers.js"></script>
-        <style>
-            body {font-family: Verdana;}
-        </style>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="/css/fontawesome/css/all.css"
+		/>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="/css/bootstrap-custom.css"
+		/>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="/css/custom-dashboard.css"
+		/>
 
-        <!-- optional: mobile support with jqueryui-touch-punch -->
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+		<!-- PivotTable.js libs from ../dist -->
+		<link rel="stylesheet" type="text/css" href="../dist/pivot.css" />
+		<script type="text/javascript" src="../dist/pivot.js"></script>
+		<script
+			type="text/javascript"
+			src="../dist/gchart_renderers.js"
+		></script>
+		<style>
+			body {
+				font-family: Verdana;
+			}
+		</style>
 
-        <!-- for examples only! script to show code to user -->
-        <script type="text/javascript" src="show_code.js"></script>
-    </head>
-    <body>
-        <script type="text/javascript">
-            // This example adds Google Chart renderers.
+		<!-- optional: mobile support with jqueryui-touch-punch -->
+		<script
+			type="text/javascript"
+			src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"
+		></script>
 
-            google.load("visualization", "1", {packages:["corechart", "charteditor"]});
-            $(function(){
-                var derivers = $.pivotUtilities.derivers;
-                var renderers = $.extend($.pivotUtilities.renderers,
-                    $.pivotUtilities.gchart_renderers);
+		<!-- for examples only! script to show code to user -->
+		<script type="text/javascript" src="show_code.js"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			// This example adds Google Chart renderers.
 
-                $.getJSON("mps.json", function(mps) {
-                    $("#output").pivotUI(mps, {
-                        renderers: renderers,
-                        derivedAttributes: {
-                            "Age Bin": derivers.bin("Age", 10),
-                            "Gender Imbalance": function(mp) {
-                                return mp["Gender"] == "Male" ? 1 : -1;
-                            }
-                        },
-                        cols: ["Age Bin"], rows: ["Gender"],
-                        rendererName: "Area Chart",
-                        labels: {
-                            "Gender": 'Gender !!!',
-                            "Age": "Age ??"
-                        },
-                        controls: {
-                            unused: true,
-                            rules: true
-                        }
-                    });
-                });
-            });
-        </script>
+			google.load("visualization", "1", {
+				packages: ["corechart", "charteditor"]
+			});
+			$(function() {
+				var derivers = $.pivotUtilities.derivers;
+				var renderers = $.extend(
+					$.pivotUtilities.renderers,
+					$.pivotUtilities.gchart_renderers
+				);
 
-        <p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
+				$.getJSON("mps.json", function(mps) {
+					$("#output").pivotUI(mps, {
+						renderers: renderers,
+						derivedAttributes: {
+							"Age Bin": derivers.bin("Age", 10),
+							"Gender Imbalance": function(mp) {
+								return mp["Gender"] == "Male" ? 1 : -1;
+							}
+						},
+						cols: ["Age Bin"],
+						rows: ["Gender"],
+						rendererName: "Pie Chart",
+						labels: {
+							Gender: "Gender !!!",
+							Age: "Age ??"
+						},
+						controls: {
+							unused: true,
+							rules: true
+						}
+					});
+				});
+			});
+		</script>
 
-        <div id="output" style="margin: 30px; position: relative"></div>
+		<p><a href="index.html">&laquo; back to PivotTable.js examples</a></p>
 
-    </body>
+		<div id="output" style="margin: 30px; position: relative"></div>
+	</body>
 </html>

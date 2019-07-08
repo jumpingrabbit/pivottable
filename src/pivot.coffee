@@ -652,7 +652,8 @@ callWithJQuery ($) ->
 
         x = this[0]
         x.removeChild(x.lastChild) while x.hasChildNodes()
-        return @append result
+
+        return result
 
 
     ###
@@ -1070,7 +1071,14 @@ callWithJQuery ($) ->
                         return false if ""+(record[k] ? 'null') in excludedItems
                     return true
 
-                pivotTable.pivot(materializedInput,subopts)
+                if (["Line Chart", "Bar Chart", "Stacked Bar Chart", "Area Chart", "Scatter Chart", "Pie Chart"].indexOf(renderer.val()) > -1)
+                    {result, wrapper} = pivotTable.pivot(materializedInput, subopts);
+                    pivotTable.append(result)
+                    wrapper.draw(result[0])
+                else
+                    pivotTable.append(pivotTable.pivot(materializedInput, subopts));
+
+
                 pivotUIOptions = $.extend {}, opts,
                     cols: subopts.cols
                     rows: subopts.rows
