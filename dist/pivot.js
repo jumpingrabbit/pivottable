@@ -1504,6 +1504,7 @@
             } else {
               top = targetOffset.top - UIOffset.top - valueListHeight;
             }
+            $(".pvtFilterBox").hide();
             return valueList.css({
               left: targetOffset.left - UIOffset.left + 10,
               top: top + 10
